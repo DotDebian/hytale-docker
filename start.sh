@@ -26,8 +26,12 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+# Check if Docker Compose is installed and detect which version
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+elif docker compose version &> /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+else
     echo -e "${RED}ERROR: Docker Compose is not installed${NC}"
     echo "Please install Docker Compose from: https://docs.docker.com/compose/install/"
     exit 1
@@ -67,16 +71,16 @@ if docker ps | grep -q hytale-server; then
     case $REPLY in
         1)
             echo -e "${GREEN}Showing logs (Ctrl+C to exit)...${NC}"
-            docker-compose logs -f
+            $DOCKER_COMPOSE logs -f
             ;;
         2)
             echo -e "${GREEN}Restarting server...${NC}"
-            docker-compose restart
+            $DOCKER_COMPOSE restart
             echo -e "${GREEN}✓ Server restarted${NC}"
             ;;
         3)
             echo -e "${YELLOW}Stopping server...${NC}"
-            docker-compose stop
+            $DOCKER_COMPOSE stop
             echo -e "${GREEN}✓ Server stopped${NC}"
             ;;
         4)
@@ -102,7 +106,7 @@ echo -e "${GREEN}Starting Hytale Server...${NC}"
 echo ""
 
 # Build and start
-docker-compose up -d --build
+$DOCKER_COMPOSE up -d --build
 
 echo ""
 echo -e "${GREEN}✓ Server container started!${NC}"
@@ -120,7 +124,7 @@ echo "2. You'll be prompted to authenticate with your Hytale account"
 echo "3. Credentials will be saved for future starts"
 echo ""
 echo -e "${GREEN}To view logs and complete authentication:${NC}"
-echo "  docker-compose logs -f"
+echo "  $DOCKER_COMPOSE logs -f"
 echo ""
 echo -e "${GREEN}To access server console:${NC}"
 echo "  docker attach hytale-server"
@@ -136,5 +140,5 @@ if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
     echo -e "${GREEN}Showing logs (Ctrl+C to exit)...${NC}"
     echo ""
     sleep 1
-    docker-compose logs -f
+    $DOCKER_COMPOSE logs -f
 fi
