@@ -9,10 +9,11 @@ RUN apt-get update && \
 WORKDIR /hytale
 
 # Download Hytale Downloader CLI
-RUN wget -q https://downloader.hytale.com/hytale-downloader.zip && \
+RUN wget https://downloader.hytale.com/hytale-downloader.zip && \
     unzip -q hytale-downloader.zip && \
-    rm hytale-downloader.zip && \
-    chmod +x hytale-downloader
+    mv hytale-downloader-linux-amd64 hytale-downloader && \
+    chmod +x hytale-downloader && \
+    rm hytale-downloader.zip
 
 # Create directories for persistent data
 RUN mkdir -p /hytale/universe /hytale/logs /hytale/mods /hytale/.cache /hytale/downloads
