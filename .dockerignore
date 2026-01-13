@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Data directories (will be mounted as volumes)
+data/
+universe/
+mods/
+.cache/
+
+# Config files (will be mounted or generated)
+config.json
+permissions.json
+whitelist.json
+bans.json
+
+# Documentation
+README.md
+docs/
+
+# Temporary files
+*.tmp
+*.bak
+*.old

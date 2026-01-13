@@ -1,0 +1,33 @@
+# Environment variables
+.env
+
+# Data directories
+data/
+
+# Server files (if manually downloaded)
+Server/
+Assets.zip
+
+# Logs
+logs/
+*.log
+
+# Docker
+.docker/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.old

@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  hytale-server:
+    build: .
+    image: hytale-server:latest
+    container_name: hytale-server
+    restart: unless-stopped
+
+    # UDP port for QUIC protocol
+    ports:
+      - "${SERVER_PORT:-5520}:5520/udp"
+
+    # Environment variables for Java and server configuration
+    environment:
+      # Auto-download server files (set to false if you want to mount manually)
+      AUTO_DOWNLOAD: "${AUTO_DOWNLOAD:-true}"
+
+      # Java heap size (adjust based on your server's RAM)
+      JAVA_OPTS: "${JAVA_OPTS:--Xms2G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200}"
+
+      # Server options
+      SERVER_OPTS: "${SERVER_OPTS:---assets Assets.zip --bind 0.0.0.0:5520}"
+
+      # Enable AOT cache for faster startup (set in .env)
+      AOT_CACHE: "${AOT_CACHE:-}"
+
+      # Disable Sentry during development (set in .env)
+      DISABLE_SENTRY: "${DISABLE_SENTRY:-}"
+
+    # Volumes for persistent data
+    volumes:
+      # Download cache (credentials and downloaded files)
+      - ./data/downloads:/hytale/downloads
+
+      # Persistent game data
+      - ./data/universe:/hytale/universe
+      - ./data/logs:/hytale/logs
+      - ./data/mods:/hytale/mods
+      - ./data/cache:/hytale/.cache
+
+      # Optional: Mount Server/ and Assets.zip manually if AUTO_DOWNLOAD=false
+      # - ./Server:/hytale/Server:ro
+      # - ./Assets.zip:/hytale/Assets.zip:ro
+
+    # Health check (optional)
+    # Note: This is basic - you may want to use Nitrado:Query plugin for better monitoring
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "HytaleServer.jar"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    # Resource limits (adjust in .env file)
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT:-4}'
+          memory: ${MEMORY_LIMIT:-6G}
+        reservations:
+          cpus: '${CPU_RESERVATION:-2}'
+          memory: ${MEMORY_RESERVATION:-4G}
+
+    # stdin/tty for interactive console
+    stdin_open: true
+    tty: true
+
+# Optional: Add a monitoring service
+# Uncomment if you want to use Prometheus monitoring
+#  prometheus:
+#    image: prom/prometheus:latest
+#    container_name: hytale-prometheus
+#    restart: unless-stopped
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#      - prometheus-data:/prometheus
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--storage.tsdb.path=/prometheus'
+
+#volumes:
+#  prometheus-data:
